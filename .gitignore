@@ -4,3 +4,8 @@ __pycache__/
 *.zip
 venv/
 .env
+.DS_Store
+Asset/
+DEMO_SCRIPT.md
+*.json
+!package.json
