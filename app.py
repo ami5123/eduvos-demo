@@ -34,6 +34,16 @@ def register_student():
     return jsonify(student), 201
 
 
+@app.route("/students/search", methods=["GET"])
+def search_students_by_course():
+    course = request.args.get("course", "").strip()
+    if not course:
+        return jsonify({"error": "course query parameter is required"}), 400
+
+    results = [s for s in students if s["course"].lower() == course.lower()]
+    return jsonify(results)
+
+
 @app.route("/students/<int:student_id>", methods=["GET"])
 def get_student(student_id):
     student = next((s for s in students if s["id"] == student_id), None)
