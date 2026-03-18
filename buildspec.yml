@@ -1,0 +1,18 @@
+version: 0.2
+phases:
+  install:
+    runtime-versions:
+      python: 3.12
+    commands:
+      - pip install -r requirements.txt
+  pre_build:
+    commands:
+      - echo "Running tests..."
+      - pytest -v
+  build:
+    commands:
+      - echo "Packaging application..."
+      - zip -r student-api.zip app.py requirements.txt appspec.yml scripts/
+artifacts:
+  files:
+    - student-api.zip
