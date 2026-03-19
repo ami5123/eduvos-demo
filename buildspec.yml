@@ -11,8 +11,7 @@ phases:
       - pytest -v
   build:
     commands:
-      - echo "Packaging application..."
-      - zip -r student-api.zip app.py requirements.txt appspec.yml scripts/
-artifacts:
-  files:
-    - student-api.zip
+      - echo "Deploying website to S3..."
+      - aws s3 cp index.html s3://eduvos-demo-website-863761415698/index.html --content-type text/html
+      - echo "Invalidating CloudFront cache..."
+      - aws cloudfront create-invalidation --distribution-id E3SR98M2IMBFJ8 --paths "/*"

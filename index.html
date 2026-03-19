@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eduvos Student Portal</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f7fa; color: #333; }
+        .header { background: linear-gradient(135deg, #232f3e, #37475a); color: white; padding: 2rem; text-align: center; }
+        .header h1 { font-size: 1.8rem; margin-bottom: 0.3rem; }
+        .header p { opacity: 0.8; font-size: 0.95rem; }
+        .container { max-width: 900px; margin: 2rem auto; padding: 0 1rem; }
+        .card { background: white; border-radius: 10px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .card h2 { margin-bottom: 1rem; color: #232f3e; font-size: 1.2rem; }
+        .form-row { display: flex; gap: 0.8rem; margin-bottom: 0.8rem; flex-wrap: wrap; }
+        .form-row input { flex: 1; padding: 0.6rem; border: 1px solid #ddd; border-radius: 6px; font-size: 0.95rem; min-width: 150px; }
+        button { padding: 0.6rem 1.2rem; border: none; border-radius: 6px; cursor: pointer; font-size: 0.95rem; font-weight: 500; }
+        .btn-primary { background: #ff9900; color: white; }
+        .btn-primary:hover { background: #e88b00; }
+        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        th, td { padding: 0.7rem; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #f8f9fa; font-weight: 600; color: #555; }
+        .status { padding: 0.3rem 0.6rem; border-radius: 12px; font-size: 0.8rem; font-weight: 500; }
+        .status-healthy { background: #d4edda; color: #155724; }
+        .status-error { background: #f8d7da; color: #721c24; }
+        .footer { text-align: center; padding: 2rem; color: #888; font-size: 0.85rem; }
+        .version-badge { display: inline-block; background: #ff9900; color: white; padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.75rem; margin-left: 0.5rem; }
+        #message { padding: 0.8rem; border-radius: 6px; margin-bottom: 1rem; display: none; }
+        .msg-success { background: #d4edda; color: #155724; display: block !important; }
+        .msg-error { background: #f8d7da; color: #721c24; display: block !important; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📚 Eduvos Student Portal <span class="version-badge">v1.0</span></h1>
+        <p>Student Registration System — Powered by AWS CI/CD + Kiro</p>
+    </div>
+
+    <div class="container">
+        <div class="card">
+            <h2>🏥 System Status</h2>
+            <p>API: <span id="health-status" class="status">Checking...</span></p>
+            <p style="margin-top:0.5rem; font-size:0.85rem; color:#888;">Pipeline: AWS CodePipeline → CodeBuild → S3 Deploy</p>
+        </div>
+
+        <div class="card">
+            <h2>➕ Register New Student</h2>
+            <div id="message"></div>
+            <div class="form-row">
+                <input type="text" id="name" placeholder="Full Name">
+                <input type="email" id="email" placeholder="Email Address">
+                <input type="text" id="course" placeholder="Course">
+            </div>
+            <button class="btn-primary" onclick="registerStudent()">Register Student</button>
+        </div>
+
+        <div class="card">
+            <h2>📋 Registered Students</h2>
+            <button class="btn-primary" onclick="loadStudents()" style="margin-bottom:0.5rem;">Refresh List</button>
+            <table>
+                <thead>
+                    <tr><th>ID</th><th>Name</th><th>Email</th><th>Course</th></tr>
+                </thead>
+                <tbody id="student-list">
+                    <tr><td colspan="4" style="text-align:center;color:#888;">No students registered yet</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>Eduvos Demo — Built with Kiro IDE | Tested by AWS CodeBuild | Deployed by AWS CodePipeline</p>
+    </div>
+
+    <script>
+        // In a full setup, this would point to your API Gateway / Lambda URL
+        // For the demo, we use local storage to simulate the API
+        let students = JSON.parse(localStorage.getItem('students') || '[]');
+
+        function showMessage(text, type) {
+            const msg = document.getElementById('message');
+            msg.textContent = text;
+            msg.className = type === 'success' ? 'msg-success' : 'msg-error';
+            setTimeout(() => { msg.style.display = 'none'; msg.className = ''; }, 3000);
+        }
+
+        function registerStudent() {
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const course = document.getElementById('course').value;
+
+            if (!name || !email) { showMessage('Name and email are required', 'error'); return; }
+            if (students.some(s => s.email === email)) { showMessage('Email already registered', 'error'); return; }
+
+            students.push({ id: students.length + 1, name, email, course });
+            localStorage.setItem('students', JSON.stringify(students));
+            showMessage(`${name} registered successfully!`, 'success');
+            document.getElementById('name').value = '';
+            document.getElementById('email').value = '';
+            document.getElementById('course').value = '';
+            loadStudents();
+        }
+
+        function loadStudents() {
+            const tbody = document.getElementById('student-list');
+            if (students.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#888;">No students registered yet</td></tr>';
+                return;
+            }
+            tbody.innerHTML = students.map(s =>
+                `<tr><td>${s.id}</td><td>${s.name}</td><td>${s.email}</td><td>${s.course}</td></tr>`
+            ).join('');
+        }
+
+        // Simulate health check
+        document.getElementById('health-status').textContent = 'Healthy';
+        document.getElementById('health-status').className = 'status status-healthy';
+        loadStudents();
+    </script>
+</body>
+</html>
