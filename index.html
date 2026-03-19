@@ -55,20 +55,7 @@
             <button class="btn-primary" onclick="registerStudent()">Register Student</button>
         </div>
 
-        <div class="card">
-            <h2>🔍 Search by Course</h2>
-            <div class="form-row">
-                <input type="text" id="search-course" placeholder="Enter course name">
-                <button class="btn-primary" onclick="searchByCourse()">Search</button>
-            </div>
-            <table id="search-results-table" style="display:none;">
-                <thead>
-                    <tr><th>ID</th><th>Name</th><th>Email</th><th>Course</th></tr>
-                </thead>
-                <tbody id="search-results"></tbody>
-            </table>
-            <p id="search-no-results" style="display:none;text-align:center;color:#888;margin-top:1rem;">No students found for this course</p>
-        </div>
+        <!-- TODO: Add search by course feature here -->
 
         <div class="card">
             <h2>📋 Registered Students</h2>
@@ -126,27 +113,6 @@
             tbody.innerHTML = students.map(s =>
                 `<tr><td>${s.id}</td><td>${s.name}</td><td>${s.email}</td><td>${s.course}</td></tr>`
             ).join('');
-        }
-
-        function searchByCourse() {
-            const course = document.getElementById('search-course').value.trim();
-            const tbody = document.getElementById('search-results');
-            const table = document.getElementById('search-results-table');
-            const noResults = document.getElementById('search-no-results');
-
-            if (!course) { showMessage('Please enter a course name', 'error'); return; }
-
-            const results = students.filter(s => s.course.toLowerCase() === course.toLowerCase());
-            if (results.length === 0) {
-                table.style.display = 'none';
-                noResults.style.display = 'block';
-            } else {
-                noResults.style.display = 'none';
-                table.style.display = 'table';
-                tbody.innerHTML = results.map(s =>
-                    `<tr><td>${s.id}</td><td>${s.name}</td><td>${s.email}</td><td>${s.course}</td></tr>`
-                ).join('');
-            }
         }
 
         // Simulate health check
