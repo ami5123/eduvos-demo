@@ -15,20 +15,6 @@ def get_students():
     return jsonify(students)
 
 
-@app.route("/students/search", methods=["GET"])
-def search_students_by_course():
-    course = request.args.get("course")
-    if not course or not course.strip():
-        return jsonify({"error": "course query parameter is required"}), 400
-
-    course = course.strip()
-    if len(course) > 100:
-        return jsonify({"error": "course parameter must be 100 characters or fewer"}), 400
-
-    results = [s for s in students if s["course"].lower() == course.lower()]
-    return jsonify(results)
-
-
 @app.route("/students", methods=["POST"])
 def register_student():
     data = request.get_json()
